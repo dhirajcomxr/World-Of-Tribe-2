@@ -3270,6 +3270,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100050, guid: e57e9b8cd5e115f4f8d7736473e5c7fd,
         type: 3}
       insertIndex: -1
+      addedObject: {fileID: -8752016394278944287}
+    - targetCorrespondingSourceObject: {fileID: 100050, guid: e57e9b8cd5e115f4f8d7736473e5c7fd,
+        type: 3}
+      insertIndex: -1
       addedObject: {fileID: 8008629088215171000}
     - targetCorrespondingSourceObject: {fileID: 100050, guid: e57e9b8cd5e115f4f8d7736473e5c7fd,
         type: 3}
@@ -3291,6 +3295,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6162354938899001826}
+    - targetCorrespondingSourceObject: {fileID: 100050, guid: e57e9b8cd5e115f4f8d7736473e5c7fd,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -2061677324304194997}
     - targetCorrespondingSourceObject: {fileID: 100048, guid: e57e9b8cd5e115f4f8d7736473e5c7fd,
         type: 3}
       insertIndex: -1
@@ -3346,6 +3354,27 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1.1, z: 0}
+--- !u!114 &-8752016394278944287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4367327907412637861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2484713967
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &8008629088215171000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3612,6 +3641,22 @@ MonoBehaviour:
     powerEffect: {fileID: 0}
   slashSpwanPos: {fileID: 4075526742599170293}
   slashColliderDisableDelayTime: 0.05
+--- !u!114 &-2061677324304194997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4367327907412637861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d6e486309a43f74587764b28f4954a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cinemachineFree: {fileID: 2597689028453552751, guid: fcaaecf53ece1484c85ae80bfd1f80b4,
+    type: 3}
+  controller: {fileID: 8008629088215171000}
+  rotationTarget: {fileID: 5359281539677012794}
 --- !u!1 &4367327907412637863 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100048, guid: e57e9b8cd5e115f4f8d7736473e5c7fd,

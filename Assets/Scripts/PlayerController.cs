@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class PlayerController : Singleton<PlayerController>
+public class PlayerController : NetworkBehaviour
 {
     // Components
     [Header("Components")]
@@ -34,7 +35,7 @@ public class PlayerController : Singleton<PlayerController>
 
     private void Update()
     {
-        if (isDead) return;
+        if (!IsOwner|| isDead) return;
 
         HandleCharacterMovement();
         HandleRotationAndMovement();
