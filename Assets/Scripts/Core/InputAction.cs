@@ -29,11 +29,11 @@ public class InputAction : Singleton<InputAction>
     {
 
 
-        if (isPCControls)
+        /*if (isPCControls)
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-        }
+        }*/
     }
     private void Update()
     {
