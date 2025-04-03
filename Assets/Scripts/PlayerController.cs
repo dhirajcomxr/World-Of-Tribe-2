@@ -14,11 +14,11 @@ public class PlayerController : NetworkBehaviour
 
     // Movement Parameters
     [Header("Movement Parameters")]
-    public float speed;
-    public float speedBoostPercentage;
-    public float turnSmoothDamp;
-    public float gravityMultiplier;
-    public float jumpForce;
+    [SerializeField] private float speed;
+    [SerializeField] private float speedBoostPercentage;
+    [SerializeField] private float turnSmoothDamp;
+    [SerializeField] private float gravityMultiplier;
+    [SerializeField] private float jumpForce;
 
     // Private Variables
     private float _turnSmoothVelocity;
@@ -35,11 +35,11 @@ public class PlayerController : NetworkBehaviour
     //Multiplayer Variables
     [SerializeField] Vector2 defaultPositionRange = new Vector2(-4, 4);
 
-        //Host
-    [SerializeField] NetworkVariable<Vector3> networkPlayerInput = new NetworkVariable<Vector3>();         
+    //Host
+    [SerializeField] NetworkVariable<Vector3> networkPlayerInput = new NetworkVariable<Vector3>();
 
 
-        //Client
+    //Client
     private Vector3 oldPlayerInput;
 
 
@@ -59,27 +59,53 @@ public class PlayerController : NetworkBehaviour
 
     private void UpdateServer()
     {
-        HandleRotationAndMovement(networkPlayerInput.Value);
-        HandleCharacterMovement(networkPlayerInput.Value);
+        // Only process movement for non-owner players on server
+        // Owner movement is handled through ClientInput -> RPC
+        if (!IsOwner)
+        {
+            HandleRotationAndMovement(networkPlayerInput.Value);
+            HandleCharacterMovement(networkPlayerInput.Value);
+        }
+
+
+        // HandleRotationAndMovement(networkPlayerInput.Value);
+        // HandleCharacterMovement(networkPlayerInput.Value);
         //transform.position = new Vector3(transform.position.x + leftRightPosition.Value, transform.position.y, transform.position.z + forwardBackPosition.Value);
     }
 
     private void ClientInput()
     {
 
-        Vector3 thisPlayerInput = InputAction.Instance._moveAction;
+         Vector3 thisPlayerInput = InputAction.Instance._moveAction;
         
         if (oldPlayerInput != thisPlayerInput)
         {
             oldPlayerInput = thisPlayerInput;
-
-            //Update Server            
+            
+            // Update Server with new input
             UpdateClientInputToServerRpc(thisPlayerInput);
+            
+            // Immediate local response (client-side prediction)
+            if (IsClient)
+            {
+                HandleRotationAndMovement(thisPlayerInput);
+                HandleCharacterMovement(thisPlayerInput);
+            }
         }
-        
+
+        // Vector3 thisPlayerInput = InputAction.Instance._moveAction;
+
+        // if (oldPlayerInput != thisPlayerInput)
+        // {
+        //     oldPlayerInput = thisPlayerInput;
+
+        //     //Update Server            
+        //     UpdateClientInputToServerRpc(thisPlayerInput);
+        // }
+
     }
 
-   
+
 
     // Methods
 
@@ -90,19 +116,46 @@ public class PlayerController : NetworkBehaviour
         {
             UpdateServer();
         }
-        if (IsClient && IsOwner)
+
+        // Only owner handles input and client-side prediction
+        if (IsOwner)
         {
             ClientInput();
+
+            // Client-side prediction (immediate response)
+            if (IsClient)
+            {
+                HandleRotationAndMovement(oldPlayerInput);
+                HandleCharacterMovement(oldPlayerInput);
+            }
+        }
+        else if (IsClient)
+        {
+            // Non-owner clients use server-authoritative movement
+            HandleRotationAndMovement(networkPlayerInput.Value);
+            HandleCharacterMovement(networkPlayerInput.Value);
         }
 
-        //if (!IsOwner|| isDead) return;
 
-        HandleRotationAndMovement(networkPlayerInput.Value);
-        HandleCharacterMovement(networkPlayerInput.Value);        
-        //ApplyGravity();
-        //HandleJump();
+        // if (IsServer)
+        // {
+        //     UpdateServer();
+        // }
+        // if (IsClient && IsOwner)
+        // {
+        //     ClientInput();
+        // }
+
+        // //if (!IsOwner|| isDead) return;
+
+        // HandleRotationAndMovement(networkPlayerInput.Value);
+        // HandleCharacterMovement(networkPlayerInput.Value);        
+        // //ApplyGravity();
+        // //HandleJump();
 
     }
+
+    
 
     private float currentVelocity; // Tracks the smoothed velocity
     private float velocityDamp;    // Reference velocity for SmoothDamp
@@ -122,7 +175,7 @@ public class PlayerController : NetworkBehaviour
             targetVelocity = inputMagnitude / 2;
         }
         else
-        {           
+        {
             if (CombatManager.Instance.isUltimateRunning)
             {
                 targetVelocity = inputMagnitude * speedBoostPercentage;
@@ -149,11 +202,11 @@ public class PlayerController : NetworkBehaviour
         // Update the animator parameter with the smoothed velocity
         anim.SetFloat(AnimHash.Velocity, currentVelocity);
         anim.SetFloat(AnimHash.AttackSpeedModification, animationSpeedModification);
-        
+
     }
-    
+
     private void HandleRotationAndMovement(Vector2 moveInput)
-    {        
+    {
 
         if (moveInput.sqrMagnitude > 0.01f && !CombatManager.Instance.isSkillPerforming) // Check if there's significant input
         {
@@ -169,7 +222,7 @@ public class PlayerController : NetworkBehaviour
 
             Debug.Log($"ERROR {CombatManager.Instance.gameObject.name} : {CombatManager.Instance.isUltimateRunning}");
 
-            if(!isGrounded || CombatManager.Instance.attackCooldownTimer > 0.1f || CombatManager.Instance.isStunned)
+            if (!isGrounded || CombatManager.Instance.attackCooldownTimer > 0.1f || CombatManager.Instance.isStunned)
             {
                 currentSpeed = speed / 2;
             }
