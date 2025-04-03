@@ -273,5 +273,12 @@ public class PlayerController : NetworkBehaviour
     public void UpdateClientInputToServerRpc(Vector3 input)
     {
         networkPlayerInput.Value = input;
+        
+        // If host, we need to update movement immediately
+        if (IsHost)
+        {
+            HandleRotationAndMovement(input);
+            HandleCharacterMovement(input);
+        }
     }
 }
