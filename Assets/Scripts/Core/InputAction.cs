@@ -28,7 +28,7 @@ public class InputAction : Singleton<InputAction>
     private void Start()
     {
 
-
+        Application.targetFrameRate = 120;
         /*if (isPCControls)
         {
             Cursor.visible = false;

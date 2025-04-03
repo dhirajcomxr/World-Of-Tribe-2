@@ -49,12 +49,12 @@ public class VFXManager : Singleton<VFXManager>
     public void StartSkillEfect()
     {
         powerUpEffects[1].powerEffect.Play();
-        CombatManager.Instance.RotationCollider.enabled = true;
+        CombatManager.Instance.rotationCollider.enabled = true;
     }
     //Stop Ultimate VFX and Animation if duration is added
     public void StopUltimateVFX()
     {
-        CombatManager.Instance.RotationCollider.enabled = false;
+        CombatManager.Instance.rotationCollider.enabled = false;
         powerUpEffects[powerEffectCount].powerEffect.Stop();
         powerUpEffects[1].powerEffect.Stop();
     }
