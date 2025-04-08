@@ -101,7 +101,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &59913025170546419
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3486,6 +3486,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: -2917985297783720117}
+    - targetCorrespondingSourceObject: {fileID: 100050, guid: e57e9b8cd5e115f4f8d7736473e5c7fd,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8185565766468345618}
     - targetCorrespondingSourceObject: {fileID: 100048, guid: e57e9b8cd5e115f4f8d7736473e5c7fd,
         type: 3}
       insertIndex: -1
@@ -3554,7 +3558,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 2484713967
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  InScenePlacedSourceGlobalObjectIdHash: 2484713967
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -3620,7 +3624,7 @@ MonoBehaviour:
   attackSequence: 000000000100000002000000
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   isStunned: 0
   detectionRadius: 2.5
   pushbackForce: 3
@@ -3767,15 +3771,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4367327907412637861}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8d6e486309a43f74587764b28f4954a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cinemachineFree: {fileID: 2597689028453552751, guid: fcaaecf53ece1484c85ae80bfd1f80b4,
-    type: 3}
-  controller: {fileID: 8008629088215171000}
-  rotationTarget: {fileID: 5359281539677012794}
+  combatManager: {fileID: 5280156237094021084}
+  LocalPlayerLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  ServerPlayerLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!114 &-2149308108522380694
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3788,6 +3795,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d33aee5bc5dbeb74f819072de6bb468a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerData:
+    playerNameText: {fileID: 0}
   playerText: {fileID: 1153690716251811181}
   combatManager: {fileID: 0}
 --- !u!114 &-3145317926943183824
@@ -3896,6 +3905,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e445015270a22d341a786c5385ffb910, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8185565766468345618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4367327907412637861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5245fa8387222e44b07a89b0c252ab6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _MainCamera: {fileID: 0}
+  playerCamera: {fileID: 0}
+  cameraTransform: {fileID: 5359281539677012794}
+  playerController: {fileID: 8008629088215171000}
 --- !u!1 &4367327907412637863 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100048, guid: e57e9b8cd5e115f4f8d7736473e5c7fd,

@@ -210,7 +210,7 @@ public class PlayerController : NetworkBehaviour
 
         if (moveInput.sqrMagnitude > 0.01f && !CombatManager.Instance.isSkillPerforming) // Check if there's significant input
         {
-            float targetAngle = Mathf.Atan2(moveInput.x, moveInput.y) * Mathf.Rad2Deg /*+ cam.eulerAngles.y*/;
+            float targetAngle = Mathf.Atan2(moveInput.x, moveInput.y) * Mathf.Rad2Deg + cam.eulerAngles.y;
 
             if (shouldRotate)
             {

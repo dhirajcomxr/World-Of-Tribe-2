@@ -6,13 +6,13 @@ using WOT.Core;
 public class InputAction : Singleton<InputAction>
 {
     public bool isPCControls = false;
-    
+
     // Inputs 
     // _movement
     public Vector2 _moveAction;
     public Vector2 _mouseAction;
     public bool meleAttack = false;
-    
+
     public bool skill_1 = false;
     public bool skill_2 = false;
     public bool skill_3 = false;
@@ -29,11 +29,7 @@ public class InputAction : Singleton<InputAction>
     {
 
         Application.targetFrameRate = 120;
-        /*if (isPCControls)
-        {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-        }*/
+
     }
     private void Update()
     {
@@ -41,8 +37,33 @@ public class InputAction : Singleton<InputAction>
             PCInput();
         else
             UIInputs();
+
+
+        MouseVisibility();
     }
 
+    public void MouseVisibility()
+    {
+        if (isPCControls)
+        {
+            // if (Input.GetKey(KeyCode.LeftAlt))
+            // {
+            //     Cursor.visible = true;
+            //     Cursor.lockState = CursorLockMode.None;
+            // }
+            // else
+            // {
+            //     Cursor.visible = false;
+            //     Cursor.lockState = CursorLockMode.Locked;
+            // }
+        }
+    }
+
+    public void OnMouseControl()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
 
     public void PCInput()
     {
@@ -132,9 +153,4 @@ public class InputAction : Singleton<InputAction>
         UIManager.Instance.skill2Attack.onClick.AddListener(() => { skill_2 = true; });
         UIManager.Instance.skill3Attack.onClick.AddListener(() => { skill_3 = true; });
     }
-
-
-
-
-
 }

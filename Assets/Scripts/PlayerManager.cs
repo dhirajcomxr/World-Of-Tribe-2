@@ -1,20 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
+using Unity.Netcode;
 
-public class PlayerManager : MonoBehaviour
+public class PlayerManager : NetworkBehaviour
 {
-    public CinemachineFreeLook cinemachineFree;
-    public PlayerController controller;
-    public Transform rotationTarget;
+   public CombatManager combatManager;
+   public LayerMask LocalPlayerLayer;
+   public LayerMask ServerPlayerLayer;
 
-    private void OnEnable()
+    void Start()
     {
-        CinemachineFreeLook localCinemachine =  Instantiate(cinemachineFree.gameObject).GetComponent<CinemachineFreeLook>();
-        localCinemachine.m_Follow = this.transform;
-        localCinemachine.m_LookAt = rotationTarget;
-        controller.cam = FindObjectOfType<CinemachineBrain>().transform;
-
+        if(IsLocalPlayer){
+            combatManager.enemyLayer = LocalPlayerLayer;
+            this.gameObject.layer = 3;
+            Debug.Log("Local Player Layer : " + this.gameObject.layer);
+        }else{
+            combatManager.enemyLayer = ServerPlayerLayer;
+            this.gameObject.layer = 6;
+            Debug.Log("Server Player Layer : " + this.gameObject.layer);
+        }
     }
 }
