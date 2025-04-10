@@ -1,6 +1,6 @@
 
+using Fusion;
 using UnityEngine;
-using Unity.Netcode;
 
 public abstract class Singleton<T> : NetworkBehaviour
                 where T : Component

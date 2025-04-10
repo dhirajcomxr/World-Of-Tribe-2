@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
+using Fusion;
 using TMPro;
 
 [System.Serializable]
@@ -13,10 +13,9 @@ public struct PlayerData
 
 public class PlayerHUD : NetworkBehaviour
 {
-    private NetworkVariable<NetworkString> playerName = new NetworkVariable<NetworkString>();
-
-    private NetworkVariable<int> playerLayerMask = new NetworkVariable<int>();
-    private NetworkVariable<int> enemyLayerMask = new NetworkVariable<int>();
+    [Networked] private string playerName {get; set;}
+    [Networked] private int playerLayerMask{ get; set;}
+    [Networked] private int enemyLayerMask{ get; set;}
 
     private bool overlaySet = false;
 
@@ -26,27 +25,34 @@ public class PlayerHUD : NetworkBehaviour
 
     void Start()
     {
-        if(IsLocalPlayer){
+        if(Runner.IsServer){
             playerData = GameObject.Find("Local Player").GetComponent<PlayerHealthData>().playerData;
         }
     }
 
-
-    public override void OnNetworkSpawn()
+     public override void Spawned()
     {
-        if (IsServer)
+        // Use this instead of Start / Awake for NetworkObjects
+         if (Runner.IsServer)
         {
-            playerName.Value = $"Player : {OwnerClientId}";
+            playerName = $"Player : {Runner.UserId}";
         }
     }
+    // public override void OnNetworkSpawn()
+    // {
+    //     if (IsServer)
+    //     {
+    //         playerName = $"Player : {OwnerClientId}";
+    //     }
+    // }
     public void SetOverlay()
     {
-        playerData.playerNameText.text = playerName.Value;
-        this.gameObject.name = playerName.Value;
+        playerData.playerNameText.text = playerName;
+        this.gameObject.name = playerName;
     }
     private void Update()
     {
-        if (!overlaySet && !string.IsNullOrEmpty(playerName.Value))
+        if (!overlaySet && !string.IsNullOrEmpty(playerName))
         {
             SetOverlay();
             overlaySet = true;

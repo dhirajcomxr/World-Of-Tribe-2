@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
-using Unity.Netcode;
 
 public class PlayerController : NetworkBehaviour
 {
@@ -36,7 +36,7 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] Vector2 defaultPositionRange = new Vector2(-4, 4);
 
     //Host
-    [SerializeField] NetworkVariable<Vector3> networkPlayerInput = new NetworkVariable<Vector3>();
+    [Networked] Vector3 networkPlayerInput{get; set; }
 
 
     //Client
@@ -46,7 +46,7 @@ public class PlayerController : NetworkBehaviour
 
     private void Start()
     {
-        if (IsOwner && IsClient)
+        if (Runner.IsServer && Runner.IsClient)
         {
             transform.position = new Vector3(
             Random.Range(defaultPositionRange.x, defaultPositionRange.y),
@@ -61,16 +61,16 @@ public class PlayerController : NetworkBehaviour
     {
         // Only process movement for non-owner players on server
         // Owner movement is handled through ClientInput -> RPC
-        if (!IsOwner)
+        if (!Runner.IsServer)
         {
-            HandleRotationAndMovement(networkPlayerInput.Value);
-            HandleCharacterMovement(networkPlayerInput.Value);
+            HandleRotationAndMovement(networkPlayerInput);
+            HandleCharacterMovement(networkPlayerInput);
         }
 
 
-        // HandleRotationAndMovement(networkPlayerInput.Value);
-        // HandleCharacterMovement(networkPlayerInput.Value);
-        //transform.position = new Vector3(transform.position.x + leftRightPosition.Value, transform.position.y, transform.position.z + forwardBackPosition.Value);
+        HandleRotationAndMovement(networkPlayerInput);
+        HandleCharacterMovement(networkPlayerInput);
+        //transform.position = new Vector3(transform.position.x + leftRightPosition, transform.position.y, transform.position.z + forwardBackPosition);
     }
 
     private void ClientInput()
@@ -86,22 +86,22 @@ public class PlayerController : NetworkBehaviour
             UpdateClientInputToServerRpc(thisPlayerInput);
             
             // Immediate local response (client-side prediction)
-            if (IsClient)
+            if (Runner.IsClient)
             {
                 HandleRotationAndMovement(thisPlayerInput);
                 HandleCharacterMovement(thisPlayerInput);
             }
         }
 
-        // Vector3 thisPlayerInput = InputAction.Instance._moveAction;
+         //Vector3 thisPlayerInput = InputAction.Instance._moveAction;
 
-        // if (oldPlayerInput != thisPlayerInput)
-        // {
-        //     oldPlayerInput = thisPlayerInput;
+        if (oldPlayerInput != thisPlayerInput)
+        {
+            oldPlayerInput = thisPlayerInput;
 
-        //     //Update Server            
-        //     UpdateClientInputToServerRpc(thisPlayerInput);
-        // }
+            //Update Server            
+            UpdateClientInputToServerRpc(thisPlayerInput);
+        }
 
     }
 
@@ -112,44 +112,44 @@ public class PlayerController : NetworkBehaviour
     private void Update()
     {
 
-        if (IsServer)
+        if (Runner.IsServer)
         {
             UpdateServer();
         }
 
-        // Only owner handles input and client-side prediction
-        if (IsOwner)
+        // // Only owner handles input and client-side prediction
+        if (Runner.IsServer)
         {
             ClientInput();
 
             // Client-side prediction (immediate response)
-            if (IsClient)
+            if (Runner.IsClient)
             {
                 HandleRotationAndMovement(oldPlayerInput);
                 HandleCharacterMovement(oldPlayerInput);
             }
         }
-        else if (IsClient)
+        else if (Runner.IsClient)
         {
             // Non-owner clients use server-authoritative movement
-            HandleRotationAndMovement(networkPlayerInput.Value);
-            HandleCharacterMovement(networkPlayerInput.Value);
+            HandleRotationAndMovement(networkPlayerInput);
+            HandleCharacterMovement(networkPlayerInput);
         }
 
 
-        // if (IsServer)
-        // {
-        //     UpdateServer();
-        // }
-        // if (IsClient && IsOwner)
-        // {
-        //     ClientInput();
-        // }
+        if (Runner.IsServer)
+        {
+            UpdateServer();
+        }
+        if (Runner.IsClient && Runner.IsServer)
+        {
+            ClientInput();
+        }
 
         // //if (!IsOwner|| isDead) return;
 
-        // HandleRotationAndMovement(networkPlayerInput.Value);
-        // HandleCharacterMovement(networkPlayerInput.Value);        
+         HandleRotationAndMovement(networkPlayerInput);
+         HandleCharacterMovement(networkPlayerInput);        
         // //ApplyGravity();
         // //HandleJump();
 
@@ -269,13 +269,13 @@ public class PlayerController : NetworkBehaviour
     }
 
 
-    [ServerRpc]
+   // [ServerRpc]
     public void UpdateClientInputToServerRpc(Vector3 input)
     {
-        networkPlayerInput.Value = input;
+        networkPlayerInput = input;
         
         // If host, we need to update movement immediately
-        if (IsHost)
+        if (Runner.IsServer)
         {
             HandleRotationAndMovement(input);
             HandleCharacterMovement(input);

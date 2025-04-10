@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
-using Unity.Netcode;
 
 public class CombatManager : Singleton<CombatManager>
 {
@@ -52,11 +52,17 @@ public class CombatManager : Singleton<CombatManager>
     public bool isUltimateRunning = false;
 
     // === Multiplayer Variables ===
-    [SerializeField] private NetworkVariable<float> networkAttackCooldownTimer = new NetworkVariable<float>();
-    [SerializeField] private NetworkVariable<bool> networkMeleAttack = new NetworkVariable<bool>();
-    [SerializeField] private NetworkVariable<bool> networkSkill_1 = new NetworkVariable<bool>();
-    [SerializeField] private NetworkVariable<bool> networkSkill_2 = new NetworkVariable<bool>();
-    [SerializeField] private NetworkVariable<bool> networkSkill_3 = new NetworkVariable<bool>();
+    [Networked] public float networkAttackCooldownTimer{get; set;}
+    [Networked] public bool networkMeleAttack {get; set;}
+    [Networked] public bool networkSkill_1 {get; set;}
+    [Networked] public bool networkSkill_2 {get; set;}
+    [Networked] public bool networkSkill_3 {get; set;}
+
+    //[SerializeField] private NetworkVariable<float> networkAttackCooldownTimer = new NetworkVariable<float>();
+    // [SerializeField] private NetworkVariable<bool> networkMeleAttack = new NetworkVariable<bool>();
+    // [SerializeField] private NetworkVariable<bool> networkSkill_1 = new NetworkVariable<bool>();
+    // [SerializeField] private NetworkVariable<bool> networkSkill_2 = new NetworkVariable<bool>();
+    // [SerializeField] private NetworkVariable<bool> networkSkill_3 = new NetworkVariable<bool>();
 
     // Client-side input tracking
     private bool oldMeleAttack;
@@ -77,30 +83,30 @@ public class CombatManager : Singleton<CombatManager>
     private void Update()
     {
         // Only update on the server or client as appropriate
-        if (IsServer)
+        if (Runner.IsServer)
         {
             UpdateServer();
         }
 
         // Handle input only for the local player
-        if (IsOwner && IsClient)
+        if (Runner.IsServer && Runner.IsClient)
         {
             HandleClientInput();
         }
 
         // Sync the attack cooldown timer from network
-        attackCooldownTimer = networkAttackCooldownTimer.Value;
+        attackCooldownTimer = networkAttackCooldownTimer;
 
         // Update combat systems
         CheckNearbyEnemies();
         HandlePushback();
-        
+
         // Only check skill timers if skills are active
         if (isSkill2Performing)
         {
             HandleRotationStop();
         }
-        
+
         if (isUltimateRunning)
         {
             HandleUltimateStop();
@@ -113,17 +119,17 @@ public class CombatManager : Singleton<CombatManager>
     private void UpdateServer()
     {
         // Update attack cooldown and reset sequence if needed
-        if (networkAttackCooldownTimer.Value > 0)
+        if (networkAttackCooldownTimer > 0)
         {
-            networkAttackCooldownTimer.Value -= Time.deltaTime;
-            if (networkAttackCooldownTimer.Value <= 0)
+            networkAttackCooldownTimer -= Time.deltaTime;
+            if (networkAttackCooldownTimer <= 0)
             {
                 currentAttackIndex = 0;
             }
         }
 
         // Process combat inputs
-        HandleAttack(networkMeleAttack.Value, networkSkill_1.Value, networkSkill_2.Value, networkSkill_3.Value);
+        HandleAttack(networkMeleAttack, networkSkill_1, networkSkill_2, networkSkill_3);
     }
 
     /// <summary>
@@ -138,9 +144,9 @@ public class CombatManager : Singleton<CombatManager>
         bool localSkill3 = InputAction.Instance.skill_3;
 
         // Only send RPC if input state changed
-        if (localMeleAttack != oldMeleAttack || 
-            localSkill1 != oldSkill_1 || 
-            localSkill2 != oldSkill_2 || 
+        if (localMeleAttack != oldMeleAttack ||
+            localSkill1 != oldSkill_1 ||
+            localSkill2 != oldSkill_2 ||
             localSkill3 != oldSkill_3)
         {
             oldMeleAttack = localMeleAttack;
@@ -158,12 +164,12 @@ public class CombatManager : Singleton<CombatManager>
     private void HandleAttack(bool meleAttack, bool skill1, bool skill2, bool skill3)
     {
         // Handle melee attack
-        if (meleAttack && !networkSkill_1.Value && networkAttackCooldownTimer.Value <= 0.5f)
+        if (meleAttack && !networkSkill_1 && networkAttackCooldownTimer <= 0.5f)
         {
             PerformAttackServerRpc(currentAttackIndex);
             currentAttackIndex = (currentAttackIndex + 1) % attackSequence.Length;
-            networkAttackCooldownTimer.Value = isUltimateRunning ? 
-                attackCooldown / ultimateAttackSpeedMultiplier : 
+            networkAttackCooldownTimer = isUltimateRunning ?
+                attackCooldown / ultimateAttackSpeedMultiplier :
                 attackCooldown;
             InputAction.Instance.meleAttack = false;
         }
@@ -196,58 +202,58 @@ public class CombatManager : Singleton<CombatManager>
 
     #region Network RPC Methods
 
-    [ServerRpc(RequireOwnership = false)]
+    //[ServerRpc(RequireOwnership = false)]
     private void UpdateCombatInputServerRpc(bool meleAttack, bool skill1, bool skill2, bool skill3)
     {
-        networkMeleAttack.Value = meleAttack;
-        networkSkill_1.Value = skill1;
-        networkSkill_2.Value = skill2;
-        networkSkill_3.Value = skill3;
+         networkMeleAttack = meleAttack;
+         networkSkill_1 = skill1;
+         networkSkill_2 = skill2;
+         networkSkill_3 = skill3;
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    // [ServerRpc(RequireOwnership = false)]
     private void PerformAttackServerRpc(int attackIndex)
     {
         PerformAttackClientRpc(attackIndex);
     }
 
-    [ClientRpc]
+    //[ClientRpc]
     private void PerformAttackClientRpc(int attackIndex)
     {
         PerformAttack(attackIndex);
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    //  [ServerRpc(RequireOwnership = false)]
     private void PerformSkillServerRpc(int skillIndex, float cooldown)
     {
         PerformSkillClientRpc(skillIndex, cooldown);
     }
 
-    [ClientRpc]
+    // [ClientRpc]
     private void PerformSkillClientRpc(int skillIndex, float cooldown)
     {
         PerformSkill(skillIndex, cooldown);
     }
 
-    [ClientRpc]
+    // [ClientRpc]
     private void StopRotationSkillClientRpc()
     {
         playerController.anim.SetTrigger(AnimHash.RotationStop);
     }
 
-    [ClientRpc]
+    //[ClientRpc]
     private void StopUltimateClientRpc()
     {
         VFXManager.Instance.StopUltimateVFX();
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    //[ServerRpc(RequireOwnership = false)]
     private void HandleSwordHitServerRpc(Vector3 hitPosition)
     {
         HandleSwordHitClientRpc(hitPosition);
     }
 
-    [ClientRpc]
+    //[ClientRpc]
     private void HandleSwordHitClientRpc(Vector3 hitPosition)
     {
         StartCoroutine(ProcessHit(hitPosition));
@@ -279,7 +285,7 @@ public class CombatManager : Singleton<CombatManager>
 
         if (skillIndex != 5) // Skip cooldown for ultimate skill
         {
-            networkAttackCooldownTimer.Value = cooldown;
+            //  networkAttackCooldownTimer.Value = cooldown;
         }
     }
 
@@ -291,8 +297,8 @@ public class CombatManager : Singleton<CombatManager>
         if (targetedEnemy != null)
         {
             Vector3 lookDirection = new Vector3(
-                targetedEnemy.position.x, 
-                transform.position.y, 
+                targetedEnemy.position.x,
+                transform.position.y,
                 targetedEnemy.position.z
             );
             transform.LookAt(lookDirection);

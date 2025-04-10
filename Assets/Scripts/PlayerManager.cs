@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
-using Unity.Netcode;
 
 public class PlayerManager : NetworkBehaviour
 {
@@ -11,7 +11,7 @@ public class PlayerManager : NetworkBehaviour
 
     void Start()
     {
-        if(IsLocalPlayer){
+        if(Runner.IsPlayer){
             combatManager.enemyLayer = LocalPlayerLayer;
             this.gameObject.layer = 3;
             Debug.Log("Local Player Layer : " + this.gameObject.layer);
