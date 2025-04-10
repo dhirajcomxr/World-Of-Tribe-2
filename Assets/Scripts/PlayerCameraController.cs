@@ -14,14 +14,15 @@ public class PlayerCameraController : NetworkBehaviour
     public PlayerController playerController;
 
 
-    void Start()
+    public override void Spawned()
     {
-        // if(IsLocalPlayer){
-        //     playerCamera = FindObjectOfType<CinemachineFreeLook>();        
-        //     playerCamera.Follow = transform;
-        //     playerCamera.LookAt = cameraTransform;
-        //     _MainCamera = Camera.main;
-        //     playerController.cam = _MainCamera.transform;
-        // }
+        if (Object.HasStateAuthority)
+        {
+            playerCamera = FindObjectOfType<CinemachineFreeLook>();
+            playerCamera.Follow = transform;
+            playerCamera.LookAt = cameraTransform;
+            _MainCamera = Camera.main;
+            playerController.cam = _MainCamera.transform;
+        }
     }
 }

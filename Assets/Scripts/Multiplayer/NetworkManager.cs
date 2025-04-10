@@ -6,24 +6,21 @@ using Fusion;
 using Fusion.Sockets;
 using System;
 using TMPro;
+using System.Linq;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    public static NetworkRunner runnerPrefab;      
+    public NetworkRunner runnerPrefab;
     public string lobbyName = "lobby";
     public float timer;
     public bool isTimerStarted = false;
     public TextMeshProUGUI timerText;
-
-    void Awake()
-    {
-        runnerPrefab = gameObject.GetComponent<NetworkRunner>();
-    }
+    public GameObject hostButton;
 
     private void Start()
     {
-        lobbyName = "lobby" + (UnityEngine.Random.Range(0, 999));
-        runnerPrefab.JoinSessionLobby(SessionLobby.Shared);       
+        //lobbyName = "lobby" + (UnityEngine.Random.Range(0, 999));
+        runnerPrefab.JoinSessionLobby(SessionLobby.Shared);
     }
     public void CreateRandomSession()
     {
@@ -36,10 +33,18 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     }
     void Update()
     {
-         if (isTimerStarted)
+        if (isTimerStarted)
         {
             timer += Time.deltaTime;
             timerText.text = timer.ToString("F1");
+        }
+        if (runnerPrefab.ActivePlayers.Count() == 2)
+        {
+            hostButton.SetActive(false);
+        }
+        else
+        {
+            hostButton.SetActive(true);
         }
     }
 

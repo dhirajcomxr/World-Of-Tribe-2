@@ -12,6 +12,6 @@ public class MPSpwanner : SimulationBehaviour, IPlayerJoined
         {
             // _SpwanPosition[player.PlayerId - 1].spwanPosition.position
             Runner.Spawn(_PlayerPrefab, transform.position, Quaternion.identity);            
-        }
+        }        
     }
 }
